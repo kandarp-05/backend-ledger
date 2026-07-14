@@ -1,7 +1,8 @@
 const mongoose=require("mongoose");
 const ledgerModel = require("./ledger.model");
+const bcrypt= require("bcryptjs")
 
-const accoutSchema = new mongoose.Schema({
+const accountSchema = new mongoose.Schema({
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"user",
@@ -13,7 +14,6 @@ const accoutSchema = new mongoose.Schema({
         enum:{
             values: ["ACTIVE","FROZEN","CLOSED"],
             message: "Status can be either ACTIVE, FROZEN or CLOSED",
-            
         }
         ,default:"ACTIVE"
     },
@@ -21,13 +21,19 @@ const accoutSchema = new mongoose.Schema({
         type:String,
         required:[true,"Currency is required for creating an account"],
         default: "INR"
+    },
+    transactionPassword:{
+        type: String,
+        required: [true,"Password is required for creating an account"],
+        minlength: [6,"password should contain more than six characters"],
+        select: false
     }
 },{
     timestamps: true
 })
 
-accoutSchema.index({user:1,status:1})
-accoutSchema.methods.getBalance=async function(){
+accountSchema.index({user:1,status:1})
+accountSchema.methods.getBalance=async function(){
     const balanceData= await ledgerModel.aggregate([
         {$match: {account: this._id}},
         {$group:{
@@ -64,6 +70,21 @@ accoutSchema.methods.getBalance=async function(){
     }
     return balanceData[0].balance
 }
-const accountModel = mongoose.model("account",accoutSchema);
+
+accountSchema.pre("save",async function(next) {
+    if (!this.isModified("transactionPassword")){
+        return
+    }
+
+    const hash= await bcrypt.hash(this.transactionPassword,10);
+    this.transactionPassword=hash;
+    return 
+})
+
+accountSchema.methods.compareTransactionPassword= async function (password) {
+    return await bcrypt.compare(password,this.transactionPassword);
+}
+
+const accountModel = mongoose.model("account",accountSchema);
 
 module.exports=accountModel;

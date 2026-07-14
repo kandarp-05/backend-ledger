@@ -106,4 +106,97 @@ The Backend Ledger Team`;
 
   await sendEmail(userEmail, subject, text, html);
 }
-module.exports = { sendRegistrationEmail, sendTransactionEmail, sendTransactionFailureEmail };
+
+async function sendForgotPasswordEmail(userEmail, name, resetLink) {
+    const subject = "Reset Your Password - Backend Ledger";
+
+    const text = `Hello ${name},
+
+We received a request to reset your password for your Backend Ledger account.
+
+To reset your password, click the link below:
+${resetLink}
+
+If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.
+
+Note: This link will expire in 15 minutes.
+
+Best regards,
+The Backend Ledger Team`;
+
+    const html = `
+        <p>Hello ${name},</p>
+
+        <p>We received a request to reset your password for your <strong>Backend Ledger</strong> account.</p>
+
+        <p>
+            <a href="${resetLink}"
+               style="background:#2563eb;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;">
+                Reset Password
+            </a>
+        </p>
+
+        <p>Or copy and paste this link into your browser:</p>
+        <p><a href="${resetLink}">${resetLink}</a></p>
+
+        <p>If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
+
+        <p><strong>Note:</strong> This link will expire in <strong>15 minutes</strong>.</p>
+
+        <p>Best regards,<br>The Backend Ledger Team</p>
+    `;
+
+    await sendEmail(userEmail, subject, text, html);
+}
+
+async function sendForgotTransactionPasswordEmail(userEmail, name, resetLink) {
+    const subject = "Reset Your Transaction Password - Backend Ledger";
+
+    const text = `Hello ${name},
+
+We received a request to reset your transaction password for your Backend Ledger account.
+
+To reset your transaction password, click the link below:
+${resetLink}
+
+If you did not request this, you can safely ignore this email. Your current transaction password will remain unchanged.
+
+Note: This link will expire in 15 minutes.
+
+Best regards,
+The Backend Ledger Team`;
+
+    const html = `
+        <p>Hello ${name},</p>
+
+        <p>We received a request to reset your <strong>transaction password</strong> for your <strong>Backend Ledger</strong> account.</p>
+
+        <p>
+            <a href="${resetLink}"
+               style="display:inline-block;
+                      background:#2563eb;
+                      color:#ffffff;
+                      padding:10px 20px;
+                      text-decoration:none;
+                      border-radius:5px;">
+                Reset Transaction Password
+            </a>
+        </p>
+
+        <p>Or copy and paste this link into your browser:</p>
+
+        <p>
+            <a href="${resetLink}">${resetLink}</a>
+        </p>
+
+        <p>If you did not request this, you can safely ignore this email. Your current transaction password will remain unchanged.</p>
+
+        <p><strong>Note:</strong> This link will expire in <strong>15 minutes</strong>.</p>
+
+        <p>Best regards,<br>The Backend Ledger Team</p>
+    `;
+
+    await sendEmail(userEmail, subject, text, html);
+}
+
+module.exports = { sendRegistrationEmail, sendTransactionEmail, sendTransactionFailureEmail, sendForgotPasswordEmail };
