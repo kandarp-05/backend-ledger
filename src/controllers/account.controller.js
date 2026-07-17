@@ -1,3 +1,4 @@
+const { isValidObjectId } = require("mongoose");
 const accountModel=require("../models/account.model");
 const userModel = require("../models/user.model");
 
@@ -21,6 +22,36 @@ async function createAccount(req,res) {
     
 }
 
+async function getUserAccount(req,res){
+    const accounts= await accountModel.find({user: req.user._id});
+    if (accounts.legth===0){
+        return res.status(200).json({
+            success:false,
+            message:"User have no account yet"
+        })
+    }
+    let {accountId}=req.params;
+    const searched_account=[]
+    for(let acc of accounts){
+        if (acc._id.toString().startsWith(accountId.toString())){
+            searched_account.push(acc);
+        }
+    }
+    if(searched_account.length===0){
+        return res.status(200).json({
+            success:false,
+            searched_account,
+            message:"User have no account with this account number"
+        })
+    }
+    res.status(200).json({
+        success:true,
+        message:"Accounts fetched successfuly",
+        searched_account
+    })
+
+}
+
 async function getUserAccounts(req,res){
     const accounts= await accountModel.find({user: req.user._id});
     if (accounts.legth===0){
@@ -39,6 +70,12 @@ async function getUserAccounts(req,res){
 
 async function getAccountBalance(req,res){
     const {accountId} = req.params;
+    if(!isValidObjectId(accountId)){
+        return res.status(401).json({
+            message: "Enter Valid Account No.",
+            success:false
+        })
+    }
     const isValidUser= await accountModel.findOne({
         user: req.user._id,
         _id:accountId
@@ -94,6 +131,12 @@ async function resetTransactionPassword(req,res) {
       message:"Token is expired, Please try again",success:false});
   }
   const decoded= await jwt.verify(token,process.env['JWT_SECRET']);
+  if(!isValidObjectId(decoded.id)){
+        return res.status(401).json({
+            message: "Enter Valid Account No.",
+            success:false
+        })
+    }
   const account= await accountModel.findById(decoded.id)
   const {transactionPassword}=req.body;
   account.transactionPassword=transactionPassword;
@@ -131,4 +174,4 @@ async function changePassword(req,res){
         success:true
     })
 }
-module.exports={createAccount,getUserAccounts,getAccountBalance,forgotTransactionPassword,resetTransactionPassword,changePassword}
+module.exports={createAccount,getUserAccounts,getUserAccount,getAccountBalance,forgotTransactionPassword,resetTransactionPassword,changePassword}

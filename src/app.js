@@ -7,7 +7,9 @@ const accountRouter = require("./routes/account.routes");
 const transactionRouter = require("./routes/transaction.routes");
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173",
+      "https://frontend-ledger-puce.vercel.app/"
+    ],
     credentials: true,
   }))
 app.use(express.json())
