@@ -6,12 +6,18 @@ const authRouter= require("./routes/auth.routes")
 const accountRouter = require("./routes/account.routes");
 const transactionRouter = require("./routes/transaction.routes");
 
-app.use(cors({
-    origin: ["http://localhost:5173",
-      "https://frontend-ledger-puce.vercel.app/"
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://frontend-ledger-puce.vercel.app",
     ],
     credentials: true,
-  }))
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json())
 app.use(cookieParser())
 
